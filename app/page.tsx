@@ -1,14 +1,20 @@
 "use client";
 
 import { ArrowBigUp } from "lucide-react";
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import Markdown from "react-markdown";
+import { Spinner } from "./ui/loading";
 
 export default function Chat() {
   const [input, setInput] = useState("");
-  const { messages, sendMessage } = useChat();
+  const { messages, sendMessage, status } = useChat();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const messageEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   useLayoutEffect(() => {
     if (textAreaRef.current) {
@@ -66,6 +72,15 @@ export default function Chat() {
             })}
           </div>
         ))}
+        {status === "submitted" && (
+          <div className="mx-auto sm:max-w-3xl">
+            <div className="max-w-[98%] mx-auto p-2.5 mt-12 flex items-center gap-1.5">
+              <p className="font-semibold text-2xl">Assistant</p>
+              <Spinner className="size-6" />
+            </div>
+          </div>
+        )}
+        <div ref={messageEndRef} className="h-4"></div>
       </section>
 
       {/* input box */}
@@ -83,9 +98,10 @@ export default function Chat() {
             ref={textAreaRef}
           />
           <button
-            disabled={!input.trim()}
-            className={`rounded-full p-1.5 bg-black text-white mt-auto
-            ${!input.trim() ? "bg-slate-300 cursor-not-allowed" : "cursor-pointer"}`}
+            disabled={
+              !input.trim() || status === "submitted" || status === "streaming"
+            }
+            className="rounded-full p-1.5 bg-black text-white mt-autocursor-pointer disabled:cursor-not-allowed disabled:bg-slate-300"
           >
             <ArrowBigUp strokeWidth={1.5} />
           </button>
