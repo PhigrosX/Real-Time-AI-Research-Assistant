@@ -1,12 +1,22 @@
-This is a Next.js web app for AI integration testing. It can generate AI responses and search web content.
+A modern AI chat application built with Next.js, featuring real-time streaming responses and agentic web search.
 
-The app is built with:
-- Vercel AI SDK
-- Google Gemini API
-- Tavily AI SDK
-- Radix UI, shadcn/ui, and Tailwind CSS for responsive UI development
+## Core Features
 
-Currently, this project uses Gemini for model responses and Tavily for web search. It implemented responsive UI design, supporting both mobile and desktop.
+- **App Router** — Built on Next.js App Router with a dedicated API route (`/api/chat`) handling all model interactions server-side.
+- **Streaming Output** — Uses `streamText` from the Vercel AI SDK to stream model responses token-by-token in real time, delivering a fluid chat experience.
+- **Vercel AI Gateway** — Model requests are routed through Vercel AI Gateway (`AI_GATEWAY_API_KEY`), enabling centralized API key management, usage monitoring, and provider abstraction.
+- **Agentic Web Search (Tool Calling)** — Integrates Tavily AI SDK as a callable tool. The model autonomously decides when to invoke a web search, retrieves real-time results, and incorporates them into its response — without manual intervention.
+- **Responsive UI** — Built with Radix UI, shadcn/ui, and Tailwind CSS, supporting both mobile and desktop layouts.
+
+## Tech Stack
+
+| Category | Technology |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| AI SDK | Vercel AI SDK |
+| Model | Google Gemini 2.5 Flash |
+| Web Search | Tavily AI SDK |
+| UI | Radix UI, shadcn/ui, Tailwind CSS |
 
 <img src="public/screenshot.png" alt="App Screenshot" height=500/>
 
