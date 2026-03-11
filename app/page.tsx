@@ -5,6 +5,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import Markdown from "react-markdown";
 import { Spinner } from "./ui/loading";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Chat() {
   const [input, setInput] = useState("");
@@ -67,6 +68,17 @@ export default function Chat() {
                         </div>
                       }
                     </div>
+                  );
+                case "tool-tavilySearch":
+                  return (
+                    !(part.state === "output-available") && (
+                      <div className="max-w-[98%] mx-auto p-2.5 mt-12 flex items-center gap-1.5">
+                        <p className="font-semibold text-2xl">Assistant</p>
+                        <Skeleton className="h-auto px-2 py-1 mr-auto">
+                          <p>Searching the internet ...</p>
+                        </Skeleton>
+                      </div>
+                    )
                   );
               }
             })}

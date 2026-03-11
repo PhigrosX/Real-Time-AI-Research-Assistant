@@ -12,6 +12,7 @@
     "@ai-sdk/google": "^3.0.43",
     "@ai-sdk/react": "^3.0.111",
     "@tailwindcss/typography": "^0.5.19",
+    "@tavily/ai-sdk": "^0.4.1",
     "ai": "^6.0.109",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
