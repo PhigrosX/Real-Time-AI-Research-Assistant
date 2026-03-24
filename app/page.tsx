@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowBigUp } from "lucide-react";
+import { ArrowBigUp, CircleStop } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import Markdown from "react-markdown";
@@ -9,9 +9,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Chat() {
   const [input, setInput] = useState("");
-  const { messages, sendMessage, status } = useChat();
+  const { messages, sendMessage, status, stop } = useChat();
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const messageEndRef = useRef<HTMLDivElement>(null);
+  // const [responseStopped, setResponseStopped] = useState(false);
+  const [cancelIds, setCancelIds] = useState<string[]>([]);
 
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -30,6 +32,27 @@ export default function Chat() {
     //send to ai
     sendMessage({ text: input });
     setInput("");
+  };
+
+  const handleCancel = () => {
+    if (status === "submitted" || status === "streaming") {
+      stop();
+      // setResponseStopped(true);
+      const stoppedMessage = messages.findLast(
+        (message) => message.role === "assistant",
+      );
+      if (stoppedMessage) {
+        // avoid duplite ids, like clicked for several times
+        setCancelIds((prev) =>
+          prev.includes(stoppedMessage.id)
+            ? prev
+            : [...prev, stoppedMessage?.id],
+        );
+      } else {
+        console.log(123);
+      }
+      console.log(1);
+    }
   };
 
   return (
@@ -72,7 +95,7 @@ export default function Chat() {
                 case "tool-tavilySearch":
                   return (
                     !(part.state === "output-available") && (
-                      <div className="max-w-[98%] mx-auto p-2.5 mt-12 flex items-center gap-1.5">
+                      <div key={`${message.id}-${i}`} className="max-w-[98%] mx-auto p-2.5 mt-12 flex items-center gap-1.5">
                         <p className="font-semibold text-2xl">Assistant</p>
                         <Skeleton className="h-auto px-2 py-1 mr-auto">
                           <p>Searching the internet ...</p>
@@ -82,6 +105,9 @@ export default function Chat() {
                   );
               }
             })}
+            {cancelIds.includes(message.id) && message.role === "assistant" && (
+              <p className="font-semibold">You stopped the response</p>
+            )}
           </div>
         ))}
         {status === "submitted" && (
@@ -109,14 +135,32 @@ export default function Chat() {
             value={input}
             ref={textAreaRef}
           />
-          <button
+          {status === "submitted" || status === "streaming" ? (
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="rounded-full p-1.5 bg-black text-white mt-auto cursor-pointer"
+            >
+              <CircleStop strokeWidth={1.5} />
+            </button>
+          ) : (
+            <button
+              disabled={!input.trim()}
+              className="rounded-full p-1.5 bg-black text-white mt-auto cursor-pointer disabled:cursor-not-allowed disabled:bg-slate-300"
+            >
+              <ArrowBigUp strokeWidth={1.5} />
+            </button>
+          )}
+
+          {/* <button
             disabled={
               !input.trim() || status === "submitted" || status === "streaming"
             }
             className="rounded-full p-1.5 bg-black text-white mt-autocursor-pointer disabled:cursor-not-allowed disabled:bg-slate-300"
           >
             <ArrowBigUp strokeWidth={1.5} />
-          </button>
+            <CircleStop strokeWidth={1.5} />
+          </button> */}
         </form>
       </section>
     </div>
